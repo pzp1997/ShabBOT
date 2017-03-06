@@ -10,9 +10,9 @@ __version__ = "1.0.0"
 __email__ = "pzpaul2002@yahoo.com"
 __status__ = "Development"
 
-NUM_MEALS = 2
-SIZE_OF_MEAL = 4
-
+NUM_MEALS = 1
+SIZE_OF_MEAL = 2
+FREQUENCY_FACTOR = 4
 MESSAGE = '\n\n'.join((
     'Hello!',
     'I am the OCP Shab-bot. Each week, I automatically invite twelve random '
@@ -69,13 +69,16 @@ def email_invitees(invitees):
     print list(invitees)
 
 
-def main():
+def make_meals(people):
     """
-    Entry point for the script.
-    """
-    people = retrieve_people()
+    Randomly select people to invite to meals.
 
-    # Randomly select people to invite
+    Args:
+        people: a dictionary of people to select from mapped to their recency
+    Returns:
+        A list of the people who were invited to meals
+    """
+    #
     invitees = np.random.choice(people.keys(), SIZE_OF_MEAL * NUM_MEALS, False,
                                 list(normalize_freq(people.values())))
 
@@ -84,9 +87,20 @@ def main():
     for _ in xrange(NUM_MEALS):
         email_invitees(itertools.islice(iter_invitees, SIZE_OF_MEAL))
 
+    return invitees
+
+
+def main():
+    """
+    Entry point for the script.
+    """
+    people = retrieve_people()
+
+    invitees = make_meals(people)
+
     # Reset invitees recency
     for invitee in invitees:
-        people[invitee] = 0
+        people[invitee] /= FREQUENCY_FACTOR
 
     # Increment everyones recency
     for person in people:
