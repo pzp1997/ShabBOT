@@ -2,10 +2,9 @@
 
 """Helps coordinate Shabbat meals in the Orthodox Community at Penn (OCP)."""
 
-import itertools
-import numpy as np
+import random
 
-import .database_helper
+from shabbot import database_helper
 
 __author__ = "Palmer Paul"
 __version__ = "1.0.0"
@@ -14,47 +13,31 @@ __status__ = "Development"
 
 NUM_MEALS = 1
 SIZE_OF_MEAL = 2
-FREQUENCY_FACTOR = 4
-MESSAGE = '\n\n'.join((
-    'Hello!',
-    'I am the OCP Shab-bot. Each week, I automatically invite twelve random '
-    'OCPeople to Shabbat Lunch. This week, my algorithms have smiled down '
-    'upon you.',
-    'Please reply-all with what you are bringing (someone/s claim the main), '
-    'and arrange a place to eat. Unfortunately I will not be able to make '
-    'it, because I have SmarterChild\'s bot-mitzvah this weekend and also '
-    'because my digestive system is made of javascript.',
-    'This week\'s randomly generated meal theme is (U.S. season 7).',
-    'Enjoy, and let me know how this goes! Always looking to update my '
-    'programming and oil my joints.'
-))
+MESSAGE = '''Hello!\n\n
+    I am the OCP Shab-bot. Each week, I automatically invite twelve random
+    OCPeople to Shabbat Lunch. This week, my algorithms have smiled down
+    upon you.\n\n
+    Please reply-all with what you are bringing (someone/s claim the main),
+    and arrange a place to eat. Unfortunately I will not be able to make
+    it, because I have SmarterChild\'s bot-mitzvah this weekend and also
+    because my digestive system is made of javascript.\n\n
+    This week\'s randomly generated meal theme is (U.S. season 7).\n\n
+    Enjoy, and let me know how this goes! Always looking to update my
+    programming and oil my joints.\n\n'''
 
 
 @database_helper.ocp_database_required
-def retrieve_people(db_conn):
+def retrieve_student_emails(db_conn=None):
     """
-    Retrieve OCPeople (and recency) from the MySQL database.
+    Retrieve email addresses of students from the MySQL database.
 
     Returns:
-        A dictionary of OCPeople mapped to their recency.
+        A list of email addresses of people in the OCP.
     """
     query = 'SELECT email FROM subscriber WHERE grad_year > 2016'
     cursor = db_conn.cursor()
     cursor.execute(query)
     return list(cursor)
-
-
-def normalize_freq(freqs):
-    """
-    Create a valid probability distribution that sums to one.
-
-    Args:
-        freqs: an integer list of frequencies
-    Returns:
-        A generator over the adjusted frequencies
-    """
-    total = float(sum(freqs))
-    return (x / total for x in freqs)
 
 
 def email_invitees(invitees):
@@ -67,23 +50,20 @@ def email_invitees(invitees):
     print list(invitees)
 
 
-def make_meals(people):
+def make_meals(emails):
     """
     Randomly select people to invite to meals.
 
     Args:
-        people: a dictionary of people to select from mapped to their recency
+        emails: a list of email addresses of potential invitees
     Returns:
         A list of the people who were invited to meals
     """
-    #
-    invitees = np.random.choice(people.keys(), SIZE_OF_MEAL * NUM_MEALS, False,
-                                list(normalize_freq(people.values())))
+    invitees = random.sample(emails, SIZE_OF_MEAL * NUM_MEALS)
 
     # Email invitees
-    iter_invitees = iter(invitees)
-    for _ in xrange(NUM_MEALS):
-        email_invitees(itertools.islice(iter_invitees, SIZE_OF_MEAL))
+    for i in range(0, invitees, SIZE_OF_MEAL):
+        email_invitees(invitees[i:i+SIZE_OF_MEAL])
 
     return invitees
 
@@ -92,17 +72,9 @@ def main():
     """
     Entry point for the script.
     """
-    people = retrieve_people()
+    students = retrieve_student_emails()
 
-    invitees = make_meals(people)
-
-    # Reset invitees recency
-    for invitee in invitees:
-        people[invitee] /= FREQUENCY_FACTOR
-
-    # Increment everyones recency
-    for person in people:
-        people[person] += 1
+    invitees = make_meals(students)
 
 
 if __name__ == '__main__':
