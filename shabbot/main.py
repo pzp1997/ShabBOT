@@ -5,6 +5,8 @@
 import itertools
 import numpy as np
 
+import .database_helper
+
 __author__ = "Palmer Paul"
 __version__ = "1.0.0"
 __email__ = "pzpaul2002@yahoo.com"
@@ -28,22 +30,18 @@ MESSAGE = '\n\n'.join((
 ))
 
 
-def retrieve_people():
+@database_helper.ocp_database_required
+def retrieve_people(db_conn):
     """
     Retrieve OCPeople (and recency) from the MySQL database.
 
     Returns:
         A dictionary of OCPeople mapped to their recency.
     """
-    # eventually, query the MySQL database for this information
-    people = {
-        'palmerpa': 1, 'jfried': 1, 'mrubin': 1, 'sasson': 1, 'talyako': 1,
-        'hraskas': 1, 'sspitzer': 1, 'gbarnett': 1, 'mintzo': 1, 'brenner': 1,
-        'nkest': 1, 'alevine': 1, 'akatz': 1, 'nshapiro': 1, 'liatgree': 1,
-        'jkrim': 1, 'rhalfon': 1, 'saloserf': 1, 'jbloch': 1, 'astein': 1,
-        'winick': 1, 'arichar': 1, 'jrosman': 1, 'rkellner': 1
-    }
-    return people
+    query = 'SELECT email FROM subscriber WHERE grad_year > 2016'
+    cursor = db_conn.cursor()
+    cursor.execute(query)
+    return list(cursor)
 
 
 def normalize_freq(freqs):
