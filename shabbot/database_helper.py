@@ -26,6 +26,8 @@ def connect_to_mysql(config):
     """
     Try to connect to MySQL database with given configuration settings.
 
+    Args:
+        config: configuration/credentials of the database
     Returns:
         A MySQL connection for the database
     """
