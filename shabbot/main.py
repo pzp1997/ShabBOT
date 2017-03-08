@@ -16,17 +16,18 @@ __version__ = "1.0.0"
 NUM_MEALS = 1
 SIZE_OF_MEAL = 10
 
-MESSAGE = """Hello!\n\n
-    I am the OCP Shab-bot. Each week, I automatically invite twelve random
-    OCPeople to Shabbat Lunch. This week, my algorithms have smiled down
-    upon you.\n\n
-    Please reply-all with what you are bringing (someone/s claim the main),
-    and arrange a place to eat. Unfortunately I will not be able to make
-    it, because I have SmarterChild's bot-mitzvah this weekend and also
-    because my digestive system is made of javascript.\n\n
-    This week's randomly generated meal theme is (U.S. season 7).\n\n
-    Enjoy, and let me know how this goes! Always looking to update my
-    programming and oil my joints.\n\n"""
+MESSAGE = """
+Hello!\n
+I am the OCP Shab-bot. Each week, I automatically invite twelve random
+OCPeople to Shabbat Lunch. This week, my algorithms have smiled down
+upon you.\n
+Please reply-all with what you are bringing (someone/s claim the main),
+and arrange a place to eat. Unfortunately I will not be able to make
+it, because I have SmarterChild's bot-mitzvah this weekend and also
+because my digestive system is made of javascript.\n
+This week's randomly generated meal theme is (U.S. season 7).\n
+Enjoy, and let me know how this goes! Always looking to update my
+programming and oil my joints.\n"""
 
 
 def retrieve_student_emails(db_conn):
