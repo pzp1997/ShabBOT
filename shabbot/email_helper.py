@@ -35,6 +35,7 @@ def login(user, password):
     mail = smtplib.SMTP('smtp.gmail.com', 587)
     mail.ehlo()
     mail.starttls()
+    mail.ehlo()  # should call ehlo again after starttls
     mail.login(user, password)
     return mail
 
@@ -57,4 +58,4 @@ def send_invite(mail, user, invitees, message):
     msg['From'] = sender
     msg['To'] = recipients
 
-    mail.sendmail(user, recipients, msg.as_string())
+    mail.sendmail(user, invitees, msg.as_string())
