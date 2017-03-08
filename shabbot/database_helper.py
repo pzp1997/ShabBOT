@@ -1,4 +1,5 @@
 import ConfigParser
+import logging
 import os.path
 
 import mysql.connector
@@ -22,17 +23,25 @@ def get_mysql_config():
     return dict(conf)
 
 
-def connect_to_mysql(config):
+def connect_to_mysql(config, log=True):
     """
     Try to connect to MySQL database with given configuration settings.
 
     Args:
         config: configuration/credentials of the database
+        log: boolean for enabling/disabling logging, enabled by default
     Returns:
         A MySQL connection for the database
     """
+    if log:
+        logging.info('Connecting to database...')
     try:
-        return mysql.connector.connect(**config)
+        conn = mysql.connector.connect(**config)
     except mysql.connector.Error as err:
-        print err
-        exit(1)
+        if log:
+            logging.error('Could not connect to database. %s', err)
+        raise
+    else:
+        if log:
+            logging.info('Connected to database!')
+        return conn

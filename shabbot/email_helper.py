@@ -1,5 +1,6 @@
 import ConfigParser
 from email.mime.text import MIMEText
+import logging
 import os.path
 import smtplib
 
@@ -22,21 +23,26 @@ def get_email_config():
     return (user, password)
 
 
-def login(user, password):
+def login(user, password, log=True):
     """
     Login to Gmail.
 
     Args:
         user: Gmail username
         password: Gmail password
+        log: boolean for enabling/disabling logging, enabled by default
     Returns:
         A connection to Gmail that can be used for sending emails
     """
+    if log:
+        logging.info('Logging into %s email account...', user)
     mail = smtplib.SMTP('smtp.gmail.com', 587)
     mail.ehlo()
     mail.starttls()
     mail.ehlo()  # should call ehlo again after starttls
     mail.login(user, password)
+    if log:
+        logging.info('Logged into %s email account!', user)
     return mail
 
 

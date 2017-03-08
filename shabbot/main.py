@@ -3,7 +3,9 @@
 """Helps coordinate Shabbat meals in the Orthodox Community at Penn (OCP)."""
 
 import itertools
+import logging
 import operator
+import os.path
 import random
 
 from shabbot import database_helper
@@ -71,20 +73,36 @@ def main():
     """
     Entry point for the script.
     """
+    log_file_path = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), '..', 'shabbot.log'))
+
+    logging.basicConfig(filename=log_file_path,
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%m-%d-%y %H:%M')
+
+    logging.info('Starting Shab-bot.')
+
     db_conn = database_helper.connect_to_mysql(
         database_helper.get_mysql_config())
 
+    logging.info('Retrieving student email addresses.')
     students = retrieve_student_emails(db_conn)
 
+    logging.info('Making randomized meals.')
     meals = make_meals(students)
 
     user, password = email_helper.get_email_config()
     mail = email_helper.login(user, password)
 
+    logging.info('Sending invites for meals.')
     for meal in meals:
+        logging.debug('Invitees: %s.', ', '.join(meal))
         email_helper.send_invite(mail, user, meal, MESSAGE)
 
     mail.quit()
+
+    logging.info('Goodbye!')
 
 
 if __name__ == '__main__':
